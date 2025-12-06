@@ -1,0 +1,34 @@
+# Core dependencies
+playwright==1.41.0
+requests==2.31.0
+python-dotenv==1.0.0
+pyyaml==6.0.1
+
+# CLI & UI
+click==8.1.7
+rich==13.7.0
+typer==0.9.0
+
+# Email & Templates
+jinja2==3.1.2
+smtplib==0.0.0  # Built-in but listed for clarity
+
+# Data handling
+pandas==2.1.4
+sqlalchemy==2.0.23
+
+# Email verification & enrichment
+dnspython==2.4.2
+py3dns==3.2.1
+
+# API clients
+hubspot-api-client==8.3.0
+slack-sdk==3.26.1
+
+# Anti-detection & rate limiting
+fake-useragent==1.4.0
+ratelimit==2.2.1
+
+# Utilities
+tqdm==4.66.1
+coloredlogs==15.0.1
