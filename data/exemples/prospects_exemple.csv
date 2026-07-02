@@ -1,4 +1,5 @@
-prenom,nom,entreprise,role,ville,email
-Marie,Dupont,Acme SaaS,VP Sales,Paris,marie.dupont@acme-saas.example
-Jean,Martin,DataCorp,Head of Growth,Lyon,jean.martin@datacorp.example
-Sophie,Bernard,CloudNine,CMO,Bordeaux,sophie.bernard@cloudnine.example
+prenom,nom,entreprise,role,ville,email,source_coordonnee,base_legale
+Marie,Dupont,Acme SaaS,VP Sales,Paris,marie.dupont@acme-saas.example,Formulaire "rappelez-moi" sur acme-saas.example,consentement
+Jean,Martin,DataCorp,Head of Growth,Lyon,jean.martin@datacorp.example,Fiche Google Business (indépendant - tel/email publiés pour contact),publication_pro_volontaire
+Sophie,Bernard,CloudNine,CMO,Bordeaux,sophie.bernard@cloudnine.example,Fournisseur de données XYZ Data (contrat conforme RGPD),fournisseur_conforme
+Karim,Haddad,BuildTech,Directeur Technique,Toulouse,karim.haddad@buildtech.example,,

@@ -1,18 +1,36 @@
 # Module 2 — Scoring
 
-**Statut : pas commencé (sera construit après validation du module 1).**
+**Statut : codé et fonctionnel.**
 
-## Ce que fera ce module
+## Ce que fait ce module
 
-Classe chaque prospect en chaud / tiède / froid, en combinant des critères
-simples (complétude des données, rôle, ville, etc.) et un appel à Claude
-pour affiner le jugement.
+Calcule un score par des règles simples (email présent, téléphone
+d'entreprise trouvé, rôle décisionnaire, ville cible), puis demande à
+Claude de confirmer ou corriger la catégorie (`chaud` / `tiede` / `froid`).
+Si l'appel IA échoue, le score des règles est conservé — le pipeline ne
+plante jamais pour ça.
 
-## Entrée prévue
+## Entrée
 
-Le CSV enrichi produit par le module 1.
+Le CSV enrichi produit par le module 1
+(`data/sorties/prospects_enrichis.csv`).
 
-## Sortie prévue
+## Sortie
 
-CSV trié par score décroissant, avec une colonne `score` (chaud / tiède /
-froid).
+Le même CSV, trié par score décroissant (chaud → tiède → froid), avec deux
+colonnes en plus : `score` et `score_raison`.
+
+## Utilisation
+
+```bash
+python run.py --input ../data/sorties/prospects_enrichis.csv \
+              --output ../data/sorties/prospects_scores.csv
+```
+
+Sans appel API (règles seules) :
+
+```bash
+python run.py --input ../data/sorties/prospects_enrichis.csv \
+              --output ../data/sorties/prospects_scores.csv \
+              --sans-ia
+```

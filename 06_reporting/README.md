@@ -1,16 +1,26 @@
 # Module 6 — Reporting
 
-**Statut : pas commencé.**
+**Statut : codé et fonctionnel.**
 
-## Ce que fera ce module
+## Ce que fait ce module
 
-Tableau de bord simple présentant les résultats de la chaîne complète :
-nombre de prospects traités, taux de réponse, répartition des scores, etc.
+Lit la base SQLite du CRM (module 5) et calcule : nombre total de
+prospects, nombre de prospects contactés, taux de réponse positive
+(`repondu` + `rdv_pris`), répartition par statut et par score. Sort le
+résultat en texte (console) ou en fichier HTML basique.
 
-## Entrée prévue
+## Entrée
 
-La base SQLite produite par le module 5.
+La base SQLite produite par le module 5 (`data/crm.db`).
 
-## Sortie prévue
+## Sortie
 
-Un rapport (texte ou HTML basique) résumant les résultats.
+Rapport texte affiché en console, ou fichier HTML si `--format html`.
+
+## Utilisation
+
+```bash
+python run.py --db ../data/crm.db --format texte
+
+python run.py --db ../data/crm.db --format html --output ../data/sorties/rapport.html
+```
