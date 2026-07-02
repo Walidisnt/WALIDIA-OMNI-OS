@@ -176,12 +176,24 @@ taux de réponse positive, répartition statut/score). Sortie texte
   cours de construction.
 - Aucune clé API en dur dans le code, jamais.
 
-## Note sur le reste du dépôt
+## Script tout-en-un pour utilisateur non technique
 
-Ce dépôt contient aussi un `README.md` et un dossier `core/` issus d'une
-vision antérieure et plus large du projet (scraping LinkedIn, intégrations
-HubSpot/Slack, etc.) qui n'a pas encore été implémentée concrètement
-(`core/orchestrator.py` n'existe pas). Le système décrit dans ce
-`CLAUDE.md` est une reconstruction plus progressive et pragmatique, module
-par module. Les deux visions ne sont pas encore réconciliées — à clarifier
-avec l'utilisateur avant d'aller plus loin.
+`lancer_tout.py` (racine du dépôt) enchaîne les modules 1 → 2 → 5 → 6 en
+une seule commande (`python lancer_tout.py`), avec des chemins par défaut
+sous `data/`. Il détecte l'absence de `ANTHROPIC_API_KEY` et bascule alors
+automatiquement les modules 1 et 2 en mode démo (`--sans-messages`,
+`--sans-ia`) plutôt que d'échouer. Le `README.md` racine est écrit pour un
+utilisateur non développeur (Business Developer) et pointe vers ce script
+en premier ; ce fichier (`CLAUDE.md`) reste la référence technique.
+
+## Historique : ancienne vision du dépôt (résolu le 2026-07-02)
+
+Le dépôt contenait à l'origine un `README.md` (vision growth automation
+plus large : scraping LinkedIn, HubSpot/Slack) et un dossier `core/` avec
+un stub cassé (`core/__init__.py` importait un `core/orchestrator.py` qui
+n'a jamais existé). L'utilisateur a demandé le 2026-07-02 ("Je veux que tu
+fasses tout moi je sais rien") de trancher cette ambiguïté sans lui
+redemander : le dossier `core/` a été supprimé (code mort, non utilisé
+par les 6 modules) et le `README.md` a été réécrit pour décrire le
+système réellement construit. L'ancienne version reste consultable dans
+l'historique git si besoin.
