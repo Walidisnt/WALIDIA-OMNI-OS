@@ -9,9 +9,15 @@ commandes : importer un CSV, lancer la chaîne, voir le CRM, changer le
 statut d'un contact.
 
 Lancement : python app.py (depuis ce dossier, ou via le README racine).
+
+Si WEB_USERNAME et WEB_PASSWORD sont renseignés dans .env, l'accès à
+toutes les pages exige ce mot de passe (obligatoire dès que l'app est
+déployée en ligne, sinon n'importe qui verrait les prospects). En usage
+local seul sur ta machine, ces variables peuvent rester vides.
 """
 import logging
 import os
+import secrets
 import subprocess
 import sys
 import threading
@@ -22,7 +28,9 @@ from pathlib import Path
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, Response, redirect, render_template, request, url_for
+
+load_dotenv()
 
 RACINE = Path(__file__).resolve().parent.parent
 DATA = RACINE / "data"
@@ -47,6 +55,30 @@ LIBELLES_STATUTS = {
     "refus": "Refus",
     "sans_reponse": "Sans réponse",
 }
+
+
+@app.before_request
+def exiger_mot_de_passe():
+    """
+    Protège l'app par mot de passe si WEB_USERNAME/WEB_PASSWORD sont
+    configurés (déploiement en ligne). Sans ces variables (usage local),
+    aucune authentification n'est demandée.
+    """
+    utilisateur_attendu = os.getenv("WEB_USERNAME", "")
+    mdp_attendu = os.getenv("WEB_PASSWORD", "")
+    if not utilisateur_attendu or not mdp_attendu:
+        return None
+
+    identifiants = request.authorization
+    if not identifiants or not (
+        secrets.compare_digest(identifiants.username, utilisateur_attendu)
+        and secrets.compare_digest(identifiants.password, mdp_attendu)
+    ):
+        return Response(
+            "Authentification requise.", 401,
+            {"WWW-Authenticate": 'Basic realm="WALIDIA"'},
+        )
+    return None
 
 
 def ollama_disponible():
@@ -171,7 +203,6 @@ def ouvrir_navigateur():
 
 
 if __name__ == "__main__":
-    load_dotenv()
     if not os.environ.get("WERKZEUG_RUN_MAIN"):
         threading.Timer(1.0, ouvrir_navigateur).start()
     app.run(host="127.0.0.1", port=5000, debug=False)

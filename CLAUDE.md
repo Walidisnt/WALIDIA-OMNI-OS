@@ -240,6 +240,47 @@ chaque module séparément) continue de fonctionner seule.
   Ollama n'a pas pu être vérifiée (réseau bloqué vers ollama.com dans ce
   bac à sable, cf. section moteurs IA ci-dessus).
 
+## Site vitrine statique (`docs/`, ajouté le 2026-07-05) — insuffisant, garder en tête
+
+Ajouté d'abord en réponse à "héberge sur GitHub ou Vercel, je veux voir
+le résultat" : une simple page de présentation (captures d'écran,
+explication) sans backend, déployée sur GitHub Pages. L'utilisateur a
+ensuite précisé que ce n'était PAS ce qu'il voulait ("je veux pas de
+vitrine, je veux pas de leads fictifs, je veux du concret") : il veut
+l'app réellement fonctionnelle en ligne, pas une brochure. `docs/` reste
+en place (ça ne coûte rien de le garder), mais ce n'est plus la réponse
+principale à "mets ça en ligne" — voir la section suivante.
+
+## Déploiement en ligne de l'app fonctionnelle (2026-07-05)
+
+Pour répondre au vrai besoin ("l'outil marche en ligne, avec de vraies
+données, gratuitement"), `interface_web/app.py` a été rendu déployable
+publiquement :
+
+- **Authentification HTTP Basic** ajoutée (`exiger_mot_de_passe`,
+  `@app.before_request`) : active uniquement si `WEB_USERNAME` et
+  `WEB_PASSWORD` sont renseignés dans `.env`. Vide par défaut → aucun
+  mot de passe demandé en usage local (comportement inchangé). Testé :
+  401 sans identifiants, 401 avec mauvais mot de passe, 200 avec les
+  bons.
+- `load_dotenv()` déplacé au niveau du module (plus dans
+  `if __name__ == "__main__"`) : nécessaire pour qu'un serveur WSGI
+  (PythonAnywhere) qui importe `app` sans l'exécuter comme script
+  charge quand même les variables d'environnement.
+- Hébergeur recommandé : **PythonAnywhere** (offre gratuite), pas
+  Vercel (serverless, pas adapté à SQLite + sous-processus) ni
+  Render/Railway (stockage non persistant sur leur offre gratuite —
+  le CRM se viderait à chaque redémarrage). Étapes de déploiement
+  documentées dans `interface_web/README.md`.
+- **Limite non résolue, à vérifier par l'utilisateur** : le compte
+  gratuit PythonAnywhere restreint les connexions sortantes à une
+  liste blanche de domaines. `api.anthropic.com` et les sites
+  d'entreprises arbitraires (modules 1/3) risquent de ne pas être
+  joignables depuis ce compte — le CRM, le scoring par règles et le
+  tableau de bord fonctionneront quand même (aucun appel réseau requis).
+  Documenté honnêtement, pas testé en conditions réelles (pas de compte
+  PythonAnywhere créé dans cette session).
+
 ## Conventions de code
 
 - Commentaires en français, expliquant le **pourquoi** plus que le quoi.

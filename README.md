@@ -77,6 +77,11 @@ n'est pas un site public : ça ne fonctionne que sur ta machine, personne
 d'autre n'y a accès. Pour arrêter le serveur, reviens dans le terminal et
 fais `Ctrl+C`.
 
+**Tu veux y accéder depuis internet, pas juste ta machine ?** C'est
+possible gratuitement, avec un mot de passe pour que personne d'autre
+n'y touche — voir la section "Déployer en ligne" dans
+`interface_web/README.md`.
+
 ### Option ligne de commande (plus rapide si tu es à l'aise avec un terminal)
 
 Avec le fichier d'exemple fourni :
