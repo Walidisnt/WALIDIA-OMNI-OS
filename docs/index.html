@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WALIDIA — Machine de prospection B2B, 100% gratuite et locale</title>
+<meta name="description" content="Un outil open-source qui enrichit, score et suit tes prospects B2B — 100% gratuit, tourne sur ta propre machine, conforme RGPD par défaut.">
+<style>
+  :root {
+    --paper: #efebe3;
+    --ink: #24211c;
+    --ink-muted: rgba(36, 33, 28, 0.62);
+    --ink-faint: rgba(36, 33, 28, 0.14);
+    --accent: #1f6b63;
+    --accent-ink: #f4f1ea;
+    --chaud: #b8432a;
+    --tiede: #a97c1f;
+    --froid: #3e6a8a;
+    --card: rgba(36, 33, 28, 0.035);
+    --shadow: rgba(36, 33, 28, 0.16);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1b1815;
+      --ink: #ece7de;
+      --ink-muted: rgba(236, 231, 222, 0.62);
+      --ink-faint: rgba(236, 231, 222, 0.14);
+      --accent: #5cc1b6;
+      --accent-ink: #10201d;
+      --chaud: #e2775c;
+      --tiede: #d9a94a;
+      --froid: #82b3d4;
+      --card: rgba(236, 231, 222, 0.045);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Avenir Next", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 32px); }
+
+  header.hero {
+    padding: clamp(48px, 10vw, 96px) 0 clamp(32px, 6vw, 56px);
+    text-align: center;
+  }
+
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+  }
+
+  h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.1;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+
+  .tagline {
+    font-size: clamp(16px, 2.4vw, 19px);
+    color: var(--ink-muted);
+    max-width: 52ch;
+    margin: 0 auto 32px;
+  }
+
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .bouton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .bouton.discret {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink-faint);
+  }
+
+  .screenshot-frame {
+    margin: clamp(32px, 7vw, 56px) 0;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--ink-faint);
+    box-shadow: 0 24px 48px -24px var(--shadow);
+  }
+
+  .screenshot-frame img { display: block; width: 100%; height: auto; }
+
+  section { margin: clamp(48px, 9vw, 88px) 0; }
+
+  h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(22px, 3.2vw, 28px);
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+
+  .section-lead { color: var(--ink-muted); max-width: 60ch; margin: 0 0 28px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+  }
+
+  .feature {
+    background: var(--card);
+    border: 1px solid var(--ink-faint);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+
+  .feature-badge {
+    display: inline-block;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 3px 9px;
+    border-radius: 100px;
+    color: var(--accent-ink);
+    background: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .feature-badge.a-venir { background: transparent; color: var(--ink-muted); border: 1px solid var(--ink-faint); }
+
+  .feature h3 { font-size: 16px; margin: 0 0 6px; }
+  .feature p { font-size: 14px; color: var(--ink-muted); margin: 0; }
+
+  .temperature-row { display: flex; gap: 8px; margin: 4px 0 0; }
+  .temperature-row span {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    color: var(--accent-ink);
+  }
+  .temperature-row .chaud { background: var(--chaud); }
+  .temperature-row .tiede { background: var(--tiede); }
+  .temperature-row .froid { background: var(--froid); }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--ink-faint);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--ink-faint);
+    align-items: baseline;
+  }
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+    color: var(--accent);
+    font-size: 13px;
+    flex-shrink: 0;
+    width: 18px;
+  }
+
+  .step code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", monospace;
+    background: var(--ink-faint);
+    padding: 0.15em 0.5em;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+
+  .callout {
+    background: var(--card);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    font-size: 14.5px;
+    color: var(--ink-muted);
+  }
+
+  .callout strong { color: var(--ink); }
+
+  footer {
+    border-top: 1px solid var(--ink-faint);
+    padding: 32px 0 56px;
+    font-size: 13px;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  a { color: var(--accent); }
+  a:focus-visible, .bouton:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">100&nbsp;% gratuit · local · conforme RGPD</p>
+      <h1>Ta machine de prospection B2B</h1>
+      <p class="tagline">
+        Un outil qui enrichit tes prospects, génère des messages
+        personnalisés, les classe chaud / tiède / froid et suit tes
+        contacts — sans jamais envoyer tes données ailleurs que sur ton
+        propre ordinateur.
+      </p>
+      <div class="cta-row">
+        <a class="bouton" href="https://github.com/Walidisnt/WALIDIA-OMNI-OS">Voir le code sur GitHub</a>
+        <a class="bouton discret" href="#installer">Comment l'installer</a>
+      </div>
+    </header>
+
+    <div class="screenshot-frame">
+      <img src="assets/dashboard.png" alt="Tableau de bord de l'interface web : 4 prospects avec leur score chaud/tiède/froid et leur statut de suivi.">
+    </div>
+
+    <section>
+      <h2>Ce que fait l'outil</h2>
+      <p class="section-lead">Six briques indépendantes, chacune testée séparément. Tu peux les piloter depuis l'interface web ou en ligne de commande.</p>
+      <div class="grid">
+        <div class="feature">
+          <span class="feature-badge">actif</span>
+          <h3>Enrichissement &amp; messages</h3>
+          <p>Vérifie la base légale de chaque email, cherche le numéro public de l'entreprise, rédige un message email et LinkedIn personnalisés.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-badge">actif</span>
+          <h3>Scoring</h3>
+          <p>Classe chaque prospect selon des règles vérifiables, affinées par IA.</p>
+          <div class="temperature-row"><span class="chaud">chaud</span><span class="tiede">tiède</span><span class="froid">froid</span></div>
+        </div>
+        <div class="feature">
+          <span class="feature-badge">actif</span>
+          <h3>Détection de signaux</h3>
+          <p>Repère des signaux d'achat publics (recrutement, actualité) sur le site d'une entreprise, sans rien inventer.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-badge a-venir">structure posée</span>
+          <h3>Infrastructure d'envoi</h3>
+          <p>Volontairement pas encore codée : aucun email n'est envoyé automatiquement, pour éviter tout envoi mal configuré.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-badge">actif</span>
+          <h3>CRM local</h3>
+          <p>Journal SQLite de qui a été contacté, quand, et avec quel résultat — reste sur ta machine.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-badge">actif</span>
+          <h3>Rapport</h3>
+          <p>Chiffres clés de la chaîne : prospects traités, taux de réponse, répartition des scores.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Pourquoi c'est gratuit</h2>
+      <p class="callout">
+        <strong>Aucune IA payante requise.</strong> L'outil détecte
+        automatiquement le meilleur moteur disponible sur ta machine :
+        <a href="https://ollama.com">Ollama</a> en local en priorité (gratuit
+        à vie, aucun compte), sinon Claude si tu configures une clé
+        (payant), sinon un mode sans IA où le scoring par règles continue
+        de fonctionner normalement.
+      </p>
+    </section>
+
+    <section id="installer">
+      <h2>Installer en 3 étapes</h2>
+      <p class="section-lead">Tout tourne sur ta machine. Rien n'est envoyé à un serveur tiers.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div><code>pip install -r requirements.txt</code></div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div><code>python interface_web/app.py</code> — ouvre ton navigateur automatiquement</div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div>Importe ton CSV de prospects (ou utilise l'exemple fourni) et lance la chaîne</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Cette page est une vitrine statique — elle ne traite aucune donnée. L'outil lui-même ne tourne que sur ta machine.</span>
+      <a href="https://github.com/Walidisnt/WALIDIA-OMNI-OS">github.com/Walidisnt/WALIDIA-OMNI-OS</a>
+    </footer>
+  </div>
+</body>
+</html>
