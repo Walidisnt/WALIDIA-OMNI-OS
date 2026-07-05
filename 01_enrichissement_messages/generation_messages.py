@@ -1,22 +1,32 @@
 """
-Génération des messages de prospection (email + LinkedIn) via l'API Claude.
+Génération des messages de prospection (email + LinkedIn) via un modèle IA.
+
+Deux moteurs possibles (choisis avec --moteur dans run.py) :
+- "claude" : API Anthropic (payante, meilleure qualité, nécessite une clé).
+- "ollama" : modèle IA gratuit tournant en local sur la machine de
+  l'utilisateur (via https://ollama.com), aucune clé ni compte requis,
+  gratuit à vie. Nécessite qu'Ollama soit installé et lancé.
 
 Un seul appel par prospect (les deux messages sont demandés dans le même
 prompt) pour limiter le coût et la latence. Retry simple en cas d'erreur
 transitoire, et repli sur des messages vides plutôt qu'un plantage complet
-du pipeline si l'API reste indisponible.
+du pipeline si le moteur choisi reste indisponible.
 """
 import json
 import logging
 import os
 import time
 
+import requests
 from anthropic import Anthropic, APIError
 
 logger = logging.getLogger(__name__)
 
 NB_TENTATIVES_MAX = 3
 DELAI_ENTRE_TENTATIVES_SECONDES = 2
+
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_TIMEOUT_SECONDES = 120
 
 MENTION_OPT_OUT_PAR_DEFAUT = (
     '\n\nSi vous préférez ne plus recevoir de message de ma part, '
@@ -58,31 +68,58 @@ def _extraire_json(texte):
     return json.loads(texte[debut : fin + 1])
 
 
-def generer_messages(prospect, client=None):
-    """
-    Appelle Claude pour générer message_email et message_linkedin.
-    Retourne {"message_email": ..., "message_linkedin": ...}. En cas
-    d'échec après plusieurs tentatives, retourne des messages vides.
-    """
+def _appeler_claude(prompt_utilisateur, client=None):
     client = client or Anthropic()
     modele = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
+    reponse = client.messages.create(
+        model=modele,
+        max_tokens=600,
+        system=PROMPT_SYSTEME,
+        messages=[{"role": "user", "content": prompt_utilisateur}],
+    )
+    return reponse.content[0].text
+
+
+def _appeler_ollama(prompt_utilisateur):
+    modele = os.getenv("OLLAMA_MODEL", "llama3.2")
+    reponse = requests.post(
+        f"{OLLAMA_URL}/api/generate",
+        json={
+            "model": modele,
+            "system": PROMPT_SYSTEME,
+            "prompt": prompt_utilisateur,
+            "stream": False,
+            "format": "json",
+        },
+        timeout=(2, OLLAMA_TIMEOUT_SECONDES),
+    )
+    reponse.raise_for_status()
+    return reponse.json()["response"]
+
+
+def generer_messages(prospect, moteur="claude", client=None):
+    """
+    Génère message_email et message_linkedin avec le moteur demandé
+    ("claude" ou "ollama"). Retourne {"message_email": ..., "message_linkedin": ...}.
+    En cas d'échec après plusieurs tentatives, retourne des messages vides
+    plutôt que de faire planter tout le pipeline.
+    """
+    prompt_utilisateur = construire_prompt_utilisateur(prospect)
 
     resultat = None
     for tentative in range(1, NB_TENTATIVES_MAX + 1):
         try:
-            reponse = client.messages.create(
-                model=modele,
-                max_tokens=600,
-                system=PROMPT_SYSTEME,
-                messages=[{"role": "user", "content": construire_prompt_utilisateur(prospect)}],
-            )
-            resultat = _extraire_json(reponse.content[0].text)
+            if moteur == "ollama":
+                texte = _appeler_ollama(prompt_utilisateur)
+            else:
+                texte = _appeler_claude(prompt_utilisateur, client=client)
+            resultat = _extraire_json(texte)
             break
-        except (APIError, ValueError, json.JSONDecodeError, IndexError) as erreur:
+        except (APIError, ValueError, json.JSONDecodeError, IndexError, requests.RequestException) as erreur:
             logger.warning(
-                "Tentative %s/%s échouée pour %s %s : %s",
+                "Tentative %s/%s échouée pour %s %s (moteur=%s) : %s",
                 tentative, NB_TENTATIVES_MAX,
-                prospect.get("prenom"), prospect.get("nom"), erreur,
+                prospect.get("prenom"), prospect.get("nom"), moteur, erreur,
             )
             if tentative == NB_TENTATIVES_MAX:
                 logger.error(

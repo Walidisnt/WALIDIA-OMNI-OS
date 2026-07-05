@@ -38,9 +38,15 @@ def parser_arguments():
     parser.add_argument("--input", required=True, help="CSV de prospects en entrée")
     parser.add_argument("--output", required=True, help="CSV enrichi en sortie")
     parser.add_argument(
+        "--moteur", choices=["claude", "ollama"], default="claude",
+        help="Moteur IA pour générer les messages : 'claude' (API payante, "
+        "nécessite ANTHROPIC_API_KEY) ou 'ollama' (modèle gratuit tournant "
+        "en local, voir ollama.com, aucune clé requise).",
+    )
+    parser.add_argument(
         "--sans-messages", action="store_true",
-        help="N'appelle pas l'API Claude : applique juste la conformité et "
-        "l'enrichissement entreprise (utile pour tester sans clé API).",
+        help="N'appelle aucun moteur IA : applique juste la conformité et "
+        "l'enrichissement entreprise (utile pour tester sans IA du tout).",
     )
     return parser.parse_args()
 
@@ -87,10 +93,10 @@ def main():
         df["message_linkedin"] = ""
         logger.info("Génération des messages ignorée (--sans-messages)")
     else:
-        logger.info("Génération des messages de prospection (%s prospects)", len(df))
+        logger.info("Génération des messages de prospection (%s prospects, moteur=%s)", len(df), args.moteur)
         messages_email, messages_linkedin = [], []
         for _, ligne in df.iterrows():
-            resultat = generer_messages(ligne.to_dict())
+            resultat = generer_messages(ligne.to_dict(), moteur=args.moteur)
             messages_email.append(resultat["message_email"])
             messages_linkedin.append(resultat["message_linkedin"])
             logger.info("Messages générés pour %s %s", ligne["prenom"], ligne["nom"])

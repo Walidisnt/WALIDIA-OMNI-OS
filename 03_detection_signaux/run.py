@@ -30,6 +30,11 @@ def parser_arguments():
     )
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--moteur", choices=["claude", "ollama"], default="claude",
+        help="Moteur IA pour analyser le contenu des sites : 'claude' (API "
+        "payante) ou 'ollama' (modèle gratuit en local, voir ollama.com).",
+    )
     return parser.parse_args()
 
 
@@ -44,7 +49,7 @@ def main():
 
     signaux, dates = [], []
     for _, ligne in df.iterrows():
-        resultat = detecter_signal(ligne.get("nom", ""), ligne.get("site_web", ""))
+        resultat = detecter_signal(ligne.get("nom", ""), ligne.get("site_web", ""), moteur=args.moteur)
         signaux.append(resultat["signal"])
         dates.append(resultat["date_detection"])
         logger.info("%s : %s", ligne.get("nom", ""), resultat["signal"])

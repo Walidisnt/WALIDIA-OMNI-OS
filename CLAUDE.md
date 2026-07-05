@@ -63,11 +63,47 @@ Chaque prospect porte les colonnes `source_coordonnee`, `base_legale`,
   (`claude-sonnet-4-6`)
 - `pandas` — manipulation des CSV
 - `python-dotenv` — chargement des clés depuis `.env`
-- `requests` / `httpx` — appels web pour l'enrichissement
+- `requests` / `httpx` — appels web pour l'enrichissement, et appels HTTP
+  vers l'API locale d'Ollama (moteur IA gratuit)
 - `sqlite3` (standard) — base CRM locale, à partir du module 5
 
 Clés API et secrets : toujours dans `.env` (jamais en dur dans le code).
 `.env.example` documente les variables attendues sans valeurs réelles.
+
+## Deux moteurs IA : Claude (payant) ou Ollama (gratuit)
+
+Ajouté le 2026-07-05 suite à la demande explicite de l'utilisateur
+("je veux tout faire gratuitement"). Les 3 modules qui appellent une IA
+(1 — messages, 2 — affinage du score, 3 — signaux) acceptent tous un
+paramètre `moteur` ("claude" ou "ollama") au niveau de leurs fonctions
+Python et un flag `--moteur` en CLI :
+
+- **`claude`** : API Anthropic, payante, meilleure qualité. Nécessite
+  `ANTHROPIC_API_KEY`.
+- **`ollama`** : serveur [Ollama](https://ollama.com) tournant en local
+  sur la machine de l'utilisateur (`http://localhost:11434` par défaut,
+  configurable via `OLLAMA_URL`/`OLLAMA_MODEL`). Gratuit à vie, aucune
+  clé ni compte. Utilise l'endpoint `/api/generate` avec `format: json`
+  pour forcer une sortie JSON structurée, comme pour Claude.
+
+Chaque appel Ollama utilise un timeout de connexion court (2 s) séparé du
+timeout de lecture (120 s, le temps que le modèle local génère la
+réponse) — sans ça, un serveur Ollama absent fait attendre le timeout
+complet (observé : ~2 min de blocage par appel avant le correctif).
+
+`lancer_tout.py` détecte automatiquement le moteur disponible, dans
+l'ordre : Ollama local (gratuit, priorité) → clé Anthropic (payant) →
+aucun moteur (mode démo, `--sans-messages`/`--sans-ia`). L'utilisateur
+n'a rien à configurer pour avoir une chaîne 100% gratuite et
+opérationnelle.
+
+Non testé dans cet environnement de développement : la génération réelle
+via Ollama (le nom d'hôte `ollama.com` est bloqué par la politique
+réseau du bac à sable, donc impossible d'installer/télécharger un modèle
+ici). Ce qui a été vérifié : le code appelle bien la bonne URL/API, et se
+dégrade proprement (messages vides après 3 tentatives, sans planter) si
+Ollama n'est pas lancé. À valider par l'utilisateur sur sa machine, où
+Ollama peut réellement tourner.
 
 ## Architecture des modules
 

@@ -14,10 +14,11 @@
    perso, donc toujours collectable. Approche MVP : devine un nom de
    domaine probable (ou utilise la colonne `site_web` si fournie) et
    cherche un numéro sur la page d'accueil / contact / mentions légales.
-4. Génère, via l'API Claude, un `message_email` et un `message_linkedin`
-   personnalisés par prospect (`generation_messages.py`). L'email inclut
-   toujours une mention d'opt-out (ajoutée automatiquement si le modèle
-   l'a oubliée).
+4. Génère un `message_email` et un `message_linkedin` personnalisés par
+   prospect (`generation_messages.py`), via Claude (payant) ou Ollama en
+   local (gratuit, voir `--moteur` ci-dessous). L'email inclut toujours
+   une mention d'opt-out (ajoutée automatiquement si le modèle l'a
+   oubliée).
 
 ## Entrée
 
@@ -39,16 +40,26 @@ Le même CSV, avec les colonnes de conformité complétées
 - `conformite.py` — validation de la base légale, purge des coordonnées
   non conformes.
 - `enrichissement_entreprise.py` — recherche du numéro standard public.
-- `generation_messages.py` — appels à l'API Claude avec retry.
+- `generation_messages.py` — appels au moteur IA (Claude ou Ollama) avec retry.
 
 ## Utilisation
+
+Avec Claude (nécessite `ANTHROPIC_API_KEY` dans `.env`) :
 
 ```bash
 python run.py --input ../data/exemples/prospects_exemple.csv \
               --output ../data/sorties/prospects_enrichis.csv
 ```
 
-Pour tester sans clé API (conformité + enrichissement entreprise
+Avec Ollama en local (gratuit, voir le README racine pour l'installer) :
+
+```bash
+python run.py --input ../data/exemples/prospects_exemple.csv \
+              --output ../data/sorties/prospects_enrichis.csv \
+              --moteur ollama
+```
+
+Pour tester sans aucune IA (conformité + enrichissement entreprise
 seulement, messages vides) :
 
 ```bash
@@ -56,6 +67,3 @@ python run.py --input ../data/exemples/prospects_exemple.csv \
               --output ../data/sorties/prospects_enrichis.csv \
               --sans-messages
 ```
-
-Nécessite `ANTHROPIC_API_KEY` dans `.env` (voir `.env.example`) sauf avec
-`--sans-messages`.

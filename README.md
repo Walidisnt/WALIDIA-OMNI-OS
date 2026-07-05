@@ -19,11 +19,33 @@ source venv/bin/activate        # sur Windows : venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## 2. Configurer ta clé API (optionnel mais recommandé)
+## 2. Choisir comment l'IA génère les messages (100% gratuit possible)
 
-Sans clé API, l'outil fonctionne quand même (en "mode démo" : il saute la
-génération des messages et l'analyse IA du score). Avec une clé, il
-génère vraiment les messages de prospection.
+L'outil détecte automatiquement, dans cet ordre, ce qui est disponible sur
+ta machine — tu n'as rien à configurer si tu ne veux pas :
+
+| Option | Coût | Qualité | Ce qu'il faut faire |
+|---|---|---|---|
+| **Ollama en local (recommandé si tu veux du gratuit)** | Gratuit à vie, aucun compte | Correcte | Installer un programme gratuit (5 min, voir ci-dessous) |
+| **API Anthropic (Claude)** | Payant à l'usage | Meilleure | Créer un compte et une clé API |
+| **Aucun des deux** | Gratuit | Pas de messages générés (juste le score par règles) | Rien à faire, c'est le mode par défaut |
+
+### Option gratuite : installer Ollama (recommandé)
+
+1. Va sur [ollama.com](https://ollama.com/download) et installe le
+   programme pour ton système (Mac/Windows/Linux) — comme un logiciel
+   classique, aucune carte bancaire ni compte demandé.
+2. Une fois installé, ouvre un terminal et lance une seule fois :
+   ```bash
+   ollama pull llama3.2
+   ```
+   (télécharge le modèle IA gratuit, ~2 Go, une seule fois).
+3. C'est tout. Ollama tourne en arrière-plan automatiquement après
+   l'installation. La prochaine fois que tu lances `python lancer_tout.py`,
+   il détectera Ollama tout seul et générera les messages avec, sans que
+   tu aies rien à activer.
+
+### Option payante : clé API Anthropic (si tu préfères la meilleure qualité)
 
 1. Crée un compte sur [console.anthropic.com](https://console.anthropic.com/)
    et récupère une clé API.
@@ -35,7 +57,8 @@ génère vraiment les messages de prospection.
    `ANTHROPIC_API_KEY=`.
 
 Ne partage jamais ce fichier `.env` (il n'est pas suivi par git, c'est
-normal).
+normal). Si Ollama ET une clé Anthropic sont disponibles en même temps,
+l'outil choisit Ollama en priorité (le gratuit).
 
 ## 3. Lancer l'outil
 

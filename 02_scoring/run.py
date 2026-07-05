@@ -32,9 +32,14 @@ def parser_arguments():
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument(
+        "--moteur", choices=["claude", "ollama"], default="claude",
+        help="Moteur IA pour affiner le score : 'claude' (API payante) ou "
+        "'ollama' (modèle gratuit en local, voir ollama.com).",
+    )
+    parser.add_argument(
         "--sans-ia", action="store_true",
-        help="N'utilise que les règles simples, sans appel API Claude "
-        "(plus rapide, ne nécessite pas de clé API).",
+        help="N'utilise que les règles simples, sans appel IA "
+        "(plus rapide, ne nécessite ni clé API ni Ollama).",
     )
     return parser.parse_args()
 
@@ -57,7 +62,7 @@ def main():
             categories.append(categorie_regles)
             raisons.append("règles seules (--sans-ia)")
         else:
-            categorie, raison = affiner_avec_ia(ligne.to_dict(), categorie_regles)
+            categorie, raison = affiner_avec_ia(ligne.to_dict(), categorie_regles, moteur=args.moteur)
             categories.append(categorie)
             raisons.append(raison)
         logger.info("%s %s -> %s", ligne.get("prenom", ""), ligne.get("nom", ""), categories[-1])
