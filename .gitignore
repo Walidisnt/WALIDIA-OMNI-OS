@@ -211,4 +211,5 @@ __marimo__/
 # fichiers produits par les scripts (contiennent des données personnelles).
 data/sorties/
 data/crm.db
+data/imports/
 

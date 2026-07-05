@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>WALIDIA — Lancer la chaîne</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">WALIDIA</p>
+        <h1>Importer des prospects</h1>
+      </div>
+      <a class="bouton bouton-discret" href="{{ url_for('tableau_de_bord') }}">Retour au tableau de bord</a>
+    </div>
+
+    {% if moteur == "ollama" %}
+      <p class="moteur-info">Moteur détecté : Ollama en local (gratuit). Les messages seront générés automatiquement.</p>
+    {% elif moteur == "claude" %}
+      <p class="moteur-info">Moteur détecté : Claude (clé API trouvée). Les messages seront générés automatiquement.</p>
+    {% else %}
+      <p class="moteur-info">Aucun moteur IA détecté : le score sera calculé, mais aucun message ne sera rédigé. Installe Ollama gratuitement pour l'activer (voir le README).</p>
+    {% endif %}
+
+    {% if erreur %}
+      <p class="erreur">{{ erreur }}</p>
+    {% endif %}
+
+    <form class="formulaire" method="post" enctype="multipart/form-data">
+      <div class="champ">
+        <label for="fichier_csv">Ton fichier de prospects (CSV)</label>
+        <input type="file" id="fichier_csv" name="fichier_csv" accept=".csv">
+        <span class="aide">
+          Colonnes attendues : prenom, nom, entreprise, role, ville, email,
+          source_coordonnee, base_legale. Laisse vide pour utiliser le
+          fichier d'exemple fourni.
+        </span>
+      </div>
+      <button class="bouton" type="submit">Lancer la chaîne</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -37,6 +37,7 @@ comportement par défaut sauf instruction explicite contraire.
 | 4 | Infrastructure d'envoi (structure seulement) | ✅ structure posée, **aucun code d'envoi réel** (volontaire) |
 | 5 | CRM / suivi (SQLite) | ✅ codé et testé |
 | 6 | Reporting | ✅ codé et testé |
+| — | Interface web (`interface_web/`) | ✅ codée et testée (Flask + capture d'écran Playwright) |
 
 Testé de bout en bout localement : module 1 (`--sans-messages`) → module 2
 (`--sans-ia`) → module 5 (`importer`, `statut`) → module 6 (`texte` et
@@ -66,6 +67,7 @@ Chaque prospect porte les colonnes `source_coordonnee`, `base_legale`,
 - `requests` / `httpx` — appels web pour l'enrichissement, et appels HTTP
   vers l'API locale d'Ollama (moteur IA gratuit)
 - `sqlite3` (standard) — base CRM locale, à partir du module 5
+- `flask` — serveur web local pour `interface_web/`
 
 Clés API et secrets : toujours dans `.env` (jamais en dur dans le code).
 `.env.example` documente les variables attendues sans valeurs réelles.
@@ -138,10 +140,15 @@ WALIDIA-OMNI-OS/
 │   ├── README.md
 │   ├── run.py
 │   └── crm.py
-└── 06_reporting/                   # Module 6
+├── 06_reporting/                   # Module 6
+│   ├── README.md
+│   ├── run.py
+│   └── reporting.py
+└── interface_web/                  # Interface web locale (pas un "module" numéroté)
     ├── README.md
-    ├── run.py
-    └── reporting.py
+    ├── app.py                      # serveur Flask
+    ├── templates/                  # dashboard.html, lancer.html, vide.html
+    └── static/style.css
 ```
 
 ### Module 1 — Enrichissement & Génération de messages
@@ -194,14 +201,44 @@ d'`opt_out`/`bloctel_verifie`.
 
 Journal local en SQLite (`crm.py`, table `contacts`) : statut
 (`a_contacter`, `contacte`, `repondu`, `rdv_pris`, `refus`,
-`sans_reponse`), score, base légale. CLI (`run.py`) : sous-commandes
-`importer`, `statut`, `liste`. Sert de source de vérité pour le module 6.
+`sans_reponse`), score, base légale, `message_email`/`message_linkedin`
+(ajoutées le 2026-07-05 pour l'interface web, via `ALTER TABLE`
+rétrocompatible dans `connecter()`). CLI (`run.py`) : sous-commandes
+`importer`, `statut`, `liste`. Sert de source de vérité pour le module 6
+et pour l'interface web.
 
 ### Module 6 — Reporting
 
 Lit la base SQLite du module 5 et calcule les stats (total, contactés,
 taux de réponse positive, répartition statut/score). Sortie texte
 (console) ou HTML (`reporting.py`, `run.py --format html --output ...`).
+
+## Interface web (`interface_web/`, ajoutée le 2026-07-05)
+
+Ajoutée suite à la demande explicite de l'utilisateur ("je veux du
+concret où est le site" → "oui c'est ça" en confirmant qu'il voulait une
+vraie page web plutôt qu'une commande de terminal). Ce n'est pas un
+"module" numéroté de la chaîne (elle ne prend pas de fichier en entrée /
+sortie comme les 6 modules) : c'est une couche d'interface par-dessus,
+qui reste optionnelle — la ligne de commande (`lancer_tout.py`, ou
+chaque module séparément) continue de fonctionner seule.
+
+- Serveur Flask local (`app.py`), ouvre automatiquement le navigateur sur
+  `http://127.0.0.1:5000`. N'est jamais exposé sur internet.
+- Réutilise directement les fonctions de `05_crm_suivi/crm.py` et
+  `06_reporting/reporting.py` (import via `sys.path.insert`, même
+  technique que les `run.py` des modules pour contourner le préfixe
+  numérique des dossiers). Pour importer de nouveaux prospects, appelle
+  les `run.py` des modules 1/2/5 en sous-processus, comme `lancer_tout.py`.
+- Détection du moteur IA (Ollama > Claude > aucun) dupliquée depuis
+  `lancer_tout.py` — même logique, même raison de ne pas partager de lib
+  commune entre composants indépendants.
+- Testé réellement dans cet environnement : serveur lancé, formulaire
+  d'import soumis (fichier d'exemple), tableau de bord vérifié par
+  capture d'écran Playwright, changement de statut d'un contact vérifié
+  (stats mises à jour en direct). Seule la génération de messages via
+  Ollama n'a pas pu être vérifiée (réseau bloqué vers ollama.com dans ce
+  bac à sable, cf. section moteurs IA ci-dessus).
 
 ## Conventions de code
 

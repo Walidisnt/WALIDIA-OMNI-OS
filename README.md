@@ -3,7 +3,8 @@
 Un outil qui prend une liste de prospects (CSV) et produit, pour chacun,
 un message de prospection personnalisé, un score (chaud/tiède/froid), un
 suivi dans un CRM local, et un rapport de résultats. Tout tourne sur ta
-machine, en ligne de commande.
+machine — soit dans une interface web que tu ouvres dans ton navigateur,
+soit en ligne de commande.
 
 Ce guide est écrit pour quelqu'un qui ne code pas. Suis les étapes dans
 l'ordre.
@@ -62,7 +63,23 @@ l'outil choisit Ollama en priorité (le gratuit).
 
 ## 3. Lancer l'outil
 
-Avec le fichier d'exemple fourni (pour voir comment ça marche) :
+### Option recommandée : l'interface web
+
+Une page qui s'ouvre toute seule dans ton navigateur, avec un bouton pour
+importer tes prospects et un tableau de bord pour suivre chaque contact.
+
+```bash
+python interface_web/app.py
+```
+
+Ton navigateur s'ouvre automatiquement sur `http://127.0.0.1:5000`. Ce
+n'est pas un site public : ça ne fonctionne que sur ta machine, personne
+d'autre n'y a accès. Pour arrêter le serveur, reviens dans le terminal et
+fais `Ctrl+C`.
+
+### Option ligne de commande (plus rapide si tu es à l'aise avec un terminal)
+
+Avec le fichier d'exemple fourni :
 
 ```bash
 python lancer_tout.py
@@ -74,7 +91,8 @@ Avec tes propres prospects :
 python lancer_tout.py --prospects chemin/vers/mon_fichier.csv
 ```
 
-Ton CSV doit avoir au minimum ces colonnes :
+Ton CSV doit avoir au minimum ces colonnes (les deux options, web et
+ligne de commande, acceptent le même format) :
 `prenom, nom, entreprise, role, ville, email, source_coordonnee, base_legale`
 
 Les colonnes `source_coordonnee` et `base_legale` servent à respecter le
@@ -84,7 +102,11 @@ plutôt que de prendre un risque.
 
 ## 4. Voir le résultat
 
-À la fin, le script t'indique où trouver :
+Avec l'interface web, le tableau de bord affiche tout directement : score
+de chaque prospect, messages générés (si un moteur IA est actif), et un
+menu pour changer le statut d'un contact.
+
+Avec la ligne de commande, le script t'indique où trouver :
 - un **rapport HTML** (`data/sorties/rapport.html`) — ouvre-le dans ton
   navigateur,
 - un **CSV détaillé** (`data/sorties/prospects_scores.csv`) — avec le
@@ -113,7 +135,8 @@ dans `CLAUDE.md`, mais voici l'essentiel :
 
 Tu peux aussi lancer chaque module séparément si tu veux plus de
 contrôle : chaque dossier a son propre `README.md` avec la commande
-exacte.
+exacte. L'interface web (`interface_web/`) pilote ces mêmes modules par
+des boutons plutôt que des commandes.
 
 ## 6. Ce que l'outil ne fait PAS (encore)
 
