@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>WALIDIA — Prospection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="vide">
+      <p class="eyebrow">WALIDIA</p>
+      <h1>Aucun prospect pour l'instant</h1>
+      <p>Importe un fichier de prospects pour lancer la chaîne : enrichissement, messages, score, puis CRM.</p>
+      <a class="bouton" href="{{ url_for('formulaire_lancer') }}">Importer des prospects</a>
+    </div>
+  </div>
+</body>
+</html>

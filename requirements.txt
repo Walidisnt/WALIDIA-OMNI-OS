@@ -1,34 +1,24 @@
-# Core dependencies
-playwright==1.41.0
-requests==2.31.0
-python-dotenv==1.0.0
-pyyaml==6.0.1
+# Dépendances du système d'acquisition B2B (CLAUDE.md)
+# Liste volontairement minimale : on ajoute une dépendance seulement
+# quand un module en cours de construction en a réellement besoin.
 
-# CLI & UI
-click==8.1.7
-rich==13.7.0
-typer==0.9.0
+# Appels à l'API Claude (génération de messages, scoring, signaux)
+anthropic==0.40.0
 
-# Email & Templates
-jinja2==3.1.2
-smtplib==0.0.0  # Built-in but listed for clarity
+# Lecture/écriture et manipulation des CSV de prospects
+pandas==2.2.3
 
-# Data handling
-pandas==2.1.4
-sqlalchemy==2.0.23
+# Chargement des clés API depuis le fichier .env
+python-dotenv==1.0.1
 
-# Email verification & enrichment
-dnspython==2.4.2
-py3dns==3.2.1
+# Appels web pour l'enrichissement (module 1), la détection de signaux
+# (module 3) et le moteur IA gratuit Ollama en local
+requests==2.32.3
+httpx==0.27.2
 
-# API clients
-hubspot-api-client==8.3.0
-slack-sdk==3.26.1
+# Interface web locale (interface_web/), qui pilote les modules par des
+# boutons plutôt que des commandes
+flask==3.0.3
 
-# Anti-detection & rate limiting
-fake-useragent==1.4.0
-ratelimit==2.2.1
-
-# Utilities
-tqdm==4.66.1
-coloredlogs==15.0.1
+# Note : sqlite3 (module 5, CRM) fait partie de la bibliothèque standard
+# Python, donc pas de dépendance à ajouter ici.

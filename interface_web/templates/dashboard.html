@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>WALIDIA — Tableau de bord</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <p class="eyebrow">WALIDIA</p>
+        <h1>Tableau de bord</h1>
+      </div>
+      <a class="bouton" href="{{ url_for('formulaire_lancer') }}">Importer de nouveaux prospects</a>
+    </div>
+
+    {% if stats %}
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value">{{ stats.total_prospects }}</span>
+        <span class="stat-label">prospects</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.nb_contactes }}</span>
+        <span class="stat-label">contactés</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.taux_reponse }}&nbsp;%</span>
+        <span class="stat-label">taux de réponse</span>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="contacts">
+      {% for contact in contacts %}
+      <div class="contact">
+        <div class="contact-info">
+          <div class="contact-name">{{ contact.prenom }} {{ contact.nom }}</div>
+          <div class="contact-role">{{ contact.entreprise }}</div>
+          {% if contact.email %}
+            <div class="contact-email">{{ contact.email }}</div>
+          {% else %}
+            <div class="contact-email absent">email supprimé ({{ contact.base_legale }})</div>
+          {% endif %}
+          {% if contact.message_email or contact.message_linkedin %}
+          <details>
+            <summary>Voir les messages générés</summary>
+            <div class="message-box">{{ contact.message_email or "(pas de message email)" }}</div>
+            <div class="message-box">{{ contact.message_linkedin or "(pas de message LinkedIn)" }}</div>
+          </details>
+          {% endif %}
+        </div>
+        <div class="contact-actions">
+          {% if contact.score %}
+            <span class="chip {{ contact.score }}">{{ contact.score }}</span>
+          {% endif %}
+          <form method="post" action="{{ url_for('changer_statut', contact_id=contact.id) }}">
+            <select name="statut" onchange="this.form.submit()">
+              {% for statut in statuts_valides %}
+                <option value="{{ statut }}" {% if statut == contact.statut %}selected{% endif %}>
+                  {{ libelles_statuts[statut] }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>
